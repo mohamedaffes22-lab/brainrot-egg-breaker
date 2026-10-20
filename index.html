@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break a Brainrot Egg Script — Auto Egg Breaker &amp; Rare Mutation Sniper</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#070a18;
+    --bg2:#0d1230;
+    --indigo:#4f46e5;
+    --violet:#8b5cf6;
+    --cyan:#22d3ee;
+    --text:#e8ecff;
+    --muted:#9aa3c7;
+    --card:rgba(255,255,255,.04);
+    --border:rgba(255,255,255,.09);
+    --radius:16px;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(900px 600px at 12% -10%, rgba(79,70,229,.35), transparent 60%),
+      radial-gradient(800px 600px at 88% 0%, rgba(34,211,238,.18), transparent 55%),
+      radial-gradient(1000px 800px at 50% 110%, rgba(139,92,246,.22), transparent 60%),
+      linear-gradient(160deg,#070a18 0%,#0b1029 40%,#0a0e1f 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    line-height:1.6;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+
+  /* ============ NAV ============ */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    background:rgba(10,14,32,.62);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:18px;height:68px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-weight:800;letter-spacing:.3px;font-size:1.02rem;
+    text-decoration:none;color:var(--text);white-space:nowrap;
+  }
+  .brand .logo{
+    width:32px;height:32px;border-radius:9px;
+    display:grid;place-items:center;font-size:1rem;
+    background:linear-gradient(135deg,var(--indigo),var(--violet));
+    box-shadow:0 0 18px rgba(139,92,246,.55);
+  }
+  .brand span.tag{color:var(--cyan)}
+  .nav-links{display:flex;align-items:center;gap:26px}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:500;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:#fff}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    border-radius:12px;font-weight:700;text-decoration:none;
+    cursor:pointer;border:1px solid transparent;
+    transition:transform .18s ease, box-shadow .25s ease, background .25s ease, border-color .2s;
+    font-size:.95rem;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--indigo),var(--violet));
+    color:#fff;padding:12px 22px;
+    box-shadow:0 8px 26px rgba(99,102,241,.42), inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(139,92,246,.55)}
+  .btn-ghost{
+    background:rgba(255,255,255,.03);color:var(--text);
+    border-color:var(--border);padding:12px 22px;
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.24);transform:translateY(-2px)}
+  .nav .btn-primary{padding:10px 18px;font-size:.88rem}
+
+  /* ============ HERO ============ */
+  .hero{padding:96px 0 76px;text-align:center;position:relative}
+  .pill{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:7px 16px;border-radius:999px;font-size:.8rem;font-weight:600;
+    color:#cfd6ff;letter-spacing:.4px;
+    background:rgba(99,102,241,.12);
+    border:1px solid rgba(139,92,246,.35);
+    box-shadow:0 0 24px rgba(99,102,241,.18);
+    margin-bottom:26px;
+  }
+  .pill .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 10px var(--cyan);animation:pulse 1.8s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{
+    font-size:clamp(2.1rem,5.4vw,3.9rem);
+    line-height:1.08;letter-spacing:-1.5px;font-weight:800;
+    margin-bottom:22px;
+  }
+  h1 .grad{
+    background:linear-gradient(100deg,#8b5cf6 0%,#6366f1 35%,#22d3ee 70%,#a78bfa 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.lead{
+    max-width:660px;margin:0 auto 34px;color:var(--muted);font-size:1.06rem;
+  }
+  .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:44px}
+  .hero-cta .btn{padding:15px 30px;font-size:1rem}
+  .stats{
+    display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  }
+  .chip{
+    display:flex;align-items:center;gap:9px;
+    padding:11px 18px;border-radius:12px;font-size:.85rem;font-weight:600;
+    color:#c9d1f2;background:var(--card);
+    border:1px solid var(--border);
+    backdrop-filter:blur(8px);
+  }
+  .chip b{color:#fff}
+  .chip .ico{font-size:.95rem;opacity:.9}
+
+  /* ============ SECTION HEADINGS ============ */
+  section{padding:64px 0}
+  .sec-head{text-align:center;margin-bottom:46px}
+  .sec-head h2{
+    font-size:clamp(1.55rem,3.4vw,2.35rem);font-weight:800;letter-spacing:-.7px;
+    margin-bottom:12px;
+  }
+  .sec-head p{color:var(--muted);max-width:580px;margin:0 auto;font-size:.98rem}
+  .eyebrow{
+    display:block;font-size:.75rem;font-weight:700;letter-spacing:2px;
+    text-transform:uppercase;color:var(--violet);margin-bottom:12px;
+  }
+
+  /* ============ FEATURES ============ */
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  }
+  .card{
+    position:relative;padding:28px 24px;border-radius:var(--radius);
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+    border:1px solid var(--border);
+    overflow:hidden;
+    transition:transform .25s ease, box-shadow .3s ease, border-color .25s ease;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--indigo),var(--violet),var(--cyan));
+  }
+  .card:hover{
+    transform:translateY(-7px);
+    border-color:rgba(139,92,246,.45);
+    box-shadow:0 22px 44px rgba(0,0,0,.45), 0 0 0 1px rgba(139,92,246,.18);
+  }
+  .card .ico{
+    width:48px;height:48px;border-radius:13px;display:grid;place-items:center;
+    font-size:1.4rem;margin-bottom:18px;
+    background:rgba(99,102,241,.13);
+    border:1px solid rgba(139,92,246,.28);
+  }
+  .card h3{font-size:1.05rem;font-weight:700;margin-bottom:9px;letter-spacing:-.2px}
+  .card p{font-size:.9rem;color:var(--muted)}
+
+  /* ============ HOW IT WORKS ============ */
+  .steps{position:relative;max-width:720px;margin:0 auto;padding-left:8px}
+  .steps::before{
+    content:"";position:absolute;left:29px;top:22px;bottom:22px;width:2px;
+    background:linear-gradient(180deg,var(--indigo),var(--violet) 50%,var(--cyan));
+    opacity:.55;border-radius:2px;
+  }
+  .step{position:relative;display:flex;gap:24px;padding:0 0 40px 0}
+  .step:last-child{padding-bottom:0}
+  .step .num{
+    flex:0 0 58px;width:58px;height:58px;border-radius:50%;
+    display:grid;place-items:center;font-weight:800;font-size:1.05rem;
+    background:linear-gradient(135deg,#141a3d,#0e1330);
+    border:2px solid rgba(139,92,246,.55);
+    color:#c7d0ff;position:relative;z-index:1;
+    box-shadow:0 0 0 6px rgba(12,16,40,1), 0 0 26px rgba(99,102,241,.32);
+  }
+  .step .body{padding-top:6px}
+  .step h3{font-size:1.08rem;font-weight:700;margin-bottom:6px}
+  .step p{color:var(--muted);font-size:.92rem;max-width:520px}
+
+  /* ============ FAQ ============ */
+  .faq{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
+  details{
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+    border:1px solid var(--border);border-radius:14px;
+    overflow:hidden;transition:border-color .25s, background .25s;
+  }
+  details[open]{border-color:rgba(139,92,246,.42);background:rgba(99,102,241,.07)}
+  summary{
+    list-style:none;cursor:pointer;user-select:none;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:19px 22px;font-weight:600;font-size:.98rem;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary .plus{
+    flex:0 0 26px;width:26px;height:26px;border-radius:8px;
+    display:grid;place-items:center;font-size:1.05rem;font-weight:400;
+    color:var(--violet);background:rgba(139,92,246,.14);
+    transition:transform .28s ease, color .2s;
+    line-height:1;
+  }
+  details[open] summary .plus{transform:rotate(45deg);color:var(--cyan)}
+  details .ans{
+    padding:0 22px 20px;color:var(--muted);font-size:.9rem;max-width:96%;
+  }
+
+  /* ============ CTA BANNER ============ */
+  .cta-banner{
+    position:relative;overflow:hidden;text-align:center;
+    padding:70px 28px;border-radius:24px;
+    background:
+      radial-gradient(600px 320px at 50% -20%, rgba(139,92,246,.42), transparent 70%),
+      radial-gradient(500px 300px at 15% 120%, rgba(34,211,238,.18), transparent 70%),
+      linear-gradient(180deg,rgba(20,26,61,.85),rgba(11,15,38,.92));
+    border:1px solid rgba(139,92,246,.32);
+    box-shadow:0 30px 70px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .cta-banner h2{
+    font-size:clamp(1.6rem,3.8vw,2.5rem);font-weight:800;letter-spacing:-.8px;margin-bottom:14px;
+  }
+  .cta-banner h2 .grad{
+    background:linear-gradient(100deg,#a78bfa,#22d3ee);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .cta-banner p{color:var(--muted);max-width:520px;margin:0 auto 30px;font-size:.98rem}
+  .cta-banner .btn-primary{padding:15px 34px;font-size:1rem}
+
+  /* ============ FOOTER ============ */
+  footer{
+    border-top:1px solid var(--border);
+    padding:34px 0;margin-top:20px;
+    background:rgba(5,8,20,.55);
+  }
+  .foot-inner{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    font-size:.85rem;color:var(--muted);
+  }
+  .foot-inner a{color:#c7d0ff;text-decoration:none;font-weight:600;transition:color .2s}
+  .foot-inner a:hover{color:var(--cyan)}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:640px){
+    .nav-links{display:none}
+    .nav-inner{height:62px}
+    .nav .btn-primary{padding:9px 15px;font-size:.82rem}
+    .brand{font-size:.94rem}
+    .hero{padding:64px 0 54px}
+    .hero p.lead{font-size:.96rem}
+    .hero-cta .btn{width:100%;max-width:320px}
+    .grid{grid-template-columns:1fr}
+    .stats{gap:10px}
+    .chip{font-size:.78rem;padding:9px 14px}
+    section{padding:48px 0}
+    .step{gap:18px}
+    .step .num{flex:0 0 48px;width:48px;height:48px;font-size:.92rem}
+    .steps::before{left:24px}
+    .cta-banner{padding:52px 20px;border-radius:18px}
+    .cta-banner .btn-primary{width:100%;max-width:320px}
+    .foot-inner{flex-direction:column;text-align:center}
+    summary{padding:16px 17px;font-size:.92rem}
+    details .ans{padding:0 17px 17px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="brand">
+      <span class="logo">🥚</span>
+      brainrot<span class="tag">-egg-breaker</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-primary" href="https://gitscore.cc" target="_blank" rel="noopener">Download</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="pill"><span class="dot"></span>Break a Brainrot Egg Script · Windows Build</div>
+      <h1>Break Every Brainrot Egg <span class="grad">Before the Server Even Blinks</span></h1>
+      <p class="lead">
+        An auto egg breaker with instant hatch, rare mutation sniper and a hands-free AFK farm loop
+        for Break a Brainrot. Drop it in, hit start, and let the script grind mutations while you do literally anything else.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://gitscore.cc" target="_blank" rel="noopener">⬇ Download for Windows</a>
+        <a class="btn btn-ghost" href="https://gitscore.cc" target="_blank" rel="noopener">◉ View on GitHub</a>
+      </div>
+      <div class="stats">
+        <div class="chip"><span class="ico">⬇</span><b>48,200+</b> downloads</div>
+        <div class="chip"><span class="ico">🏷</span>v<b>3.4.1</b></div>
+        <div class="chip"><span class="ico">🪟</span><b>Windows 10 / 11</b></div>
+        <div class="chip"><span class="ico">⚡</span><b>Free &amp; open source</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Features</span>
+        <h2>Built for people who hate clicking eggs</h2>
+        <p>Everything the brainrot-egg-breaker script does, tuned for speed, safety and maximum mutation yield.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="ico">🥚</div>
+          <h3>Auto Egg Breaker</h3>
+          <p>Continuously opens eggs with a tuned break interval, so your inventory never sits idle and every hatch counts.</p>
+        </article>
+        <article class="card">
+          <div class="ico">⚡</div>
+          <h3>Instant Hatch</h3>
+          <p>Skips the hatch animation delay and fires the next break immediately — roughly 3× more eggs per minute than manual play.</p>
+        </article>
+        <article class="card">
+          <div class="ico">🎯</div>
+          <h3>Rare Mutation Sniper</h3>
+          <p>Watches roll results in real time and locks onto rare mutation events, so you never miss the drop you were grinding for.</p>
+        </article>
+        <article class="card">
+          <div class="ico">🌙</div>
+          <h3>AFK Farm Loop</h3>
+          <p>A hands-free loop that keeps breaking, collecting and re-queueing overnight. Wake up to a full log of hatches.</p>
+        </article>
+        <article class="card">
+          <div class="ico">⚙️</div>
+          <h3>Live Tuning Panel</h3>
+          <p>Adjust break speed, mutation filters and loop limits from a compact overlay — no config file editing required.</p>
+        </article>
+        <article class="card">
+          <div class="ico">🛡️</div>
+          <h3>Lightweight &amp; Open Source</h3>
+          <p>Single small executable, readable source on GitHub, no bundled extras. Read exactly what runs before you launch it.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps to a full mutation log</h2>
+        <p>No installers, no dependencies, no drama — the whole setup takes under a minute.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="num">01</div>
+          <div class="body">
+            <h3>Download &amp; unzip</h3>
+            <p>Grab the latest build from gitscore.cc, extract the folder anywhere and keep the executable in its own directory.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">02</div>
+          <div class="body">
+            <h3>Launch alongside the game</h3>
+            <p>Open Break a Brainrot first, then run the script. It attaches to the running session and shows the tuning overlay.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">03</div>
+          <div class="body">
+            <h3>Enable the AFK loop</h3>
+            <p>Pick auto breaker, instant hatch or the full farm loop, set your mutation filters, and let it run uninterrupted.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions before you break your first egg</h2>
+        <p>The short answers to what people ask most about the brainrot-egg-breaker script.</p>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Is the Break a Brainrot Egg Script free? <span class="plus">+</span></summary>
+          <div class="ans">Yes. brainrot-egg-breaker is free and open source. Every build is published on gitscore.cc, and the source is public on GitHub if you want to review or compile it yourself.</div>
+        </details>
+        <details>
+          <summary>Does instant hatch actually speed up egg breaking? <span class="plus">+</span></summary>
+          <div class="ans">It removes the hatch animation wait between breaks and re-queues the next egg immediately. In practice that means several times more hatches per session compared to clicking manually.</div>
+        </details>
+        <details>
+          <summary>How does the rare mutation sniper work? <span class="plus">+</span></summary>
+          <div class="ans">The script reads roll results as they appear and compares them against your selected mutation list. When something matches, it flags the hatch and keeps a timestamped log so you can review the run later.</div>
+        </details>
+        <details>
+          <summary>Can I leave the AFK farm loop running overnight? <span class="plus">+</span></summary>
+          <div class="ans">That's exactly what it's designed for. Set the loop limits and mutation filters, keep your machine awake, and it will keep breaking and collecting in the background. Check the log in the morning.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA BANNER ================= -->
+  <section>
+    <div class="wrap">
+      <div class="cta-banner">
+        <h2>Stop clicking. <span class="grad">Start hatching.</span></h2>
+        <p>Download the latest brainrot-egg-breaker build and let the auto breaker, instant hatch and mutation sniper do the boring part.</p>
+        <a class="btn btn-primary" href="https://gitscore.cc" target="_blank" rel="noopener">⬇ Get the Script on gitscore.cc</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap foot-inner">
+    <div>© 2025 brainrot-egg-breaker · Break a Brainrot Egg Script. All rights reserved.</div>
+    <div class="foot-links">
+      <a href="https://gitscore.cc" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://gitscore.cc" target="_blank" rel="noopener">Download</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
